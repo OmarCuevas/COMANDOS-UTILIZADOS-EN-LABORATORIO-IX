@@ -1,0 +1,406 @@
+****************** COMANDOS UTILIZADOS EN LABORATORIO IX ********************************************
+
+****************** PRACTICA 1: INSTALACION DE WEBMIN ********************************************
+
+
+1-) INSTALAR DEPENDENCIAS: 
+
+
+1- sudo dnf install -y perl perl-Net-SSLeay openssl unzip policycoreutils-python-utils
+
+=================================================================================================
+
+2-) DESCARGAR WEBMIN: 
+
+1- wget http://www.webmin.com/download/rpm/webmin-current.rpm
+
+==============================================================================================
+
+3-) INSTALAR WEBMIN: 
+
+1- sudo dnf install -y webmin-current.rpm 
+
+================================================================================================
+
+4-) ACTIVAR EL SERVICIO DE WEBMIN: 
+
+
+2- sudo systemctl enable --now webmin
+
+3- sudo systemctl status webmin 
+
+==================================================================================================
+
+5-) ACTIVAR LOS PUERTOS: 
+
+1- sudo firewall-cmd --permanent --zone=public --add-port=10000/tcp 
+
+2- sudo firewall-cmd --reload
+
+=====================================================================================================
+
+ 6-) IR A LA INTERFAZ GRAFICA EN EL NAVEGADOR: 
+
+1- localhost:10000
+
+(LOGIN: ROOT Y LA PASSWORD LA QUE TIENE NUESTRO USUARIO ROOT) 
+
+================================================================================================
+
+
+
+****************** PRACTICA 2: DESPLIEGUE DE UNA VM CON TERRAFORM EN DIGITAL OCEAN ********************************************
+
+
+1-) IR A LA PAGINA DE DIGITAL OCEAN: <================= PARA MOSTRAR QUE HAY QUE TENER UNA CUENTA DE DIGITAL OCEAN. 
+
+1- ACCEDER AL PANEL DE CONTROL 
+
+===================================================================================================================================
+
+2-) INSTALAR TERRAFORM: 
+
+1- sudo dnf install -y yum-utils 
+
+2- sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo 
+
+3- sudo dnf install -y terraform 
+
+===============================================================================================================================
+
+3-) CONFIGURAR SSH: 
+
+1- ssh-keygen -t rsa -b 4096
+
+2- cat ~/.ssh/id_rsa.pub
+
+3- nos dirigimos a Digital Ocean. > SETTINGS > SECURITY > ADD SSH KEY 
+
+4- Luego de que ya hemos puesto la llave, le damos a copiar (A LOS 2 CUADRITOS) y guardamos eso en cualquier lado.
+
+
+==========================================================================================================================================================
+
+4-) CREAR EL ARCHIVO "MAIN.TF"
+
+1- mkdir terraform 
+
+2- cd ~/terraform 
+
+3- sudo nano main.tf 
+
+terraform {
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = ">= 1.0.0"
+    }
+  }
+}
+
+provider "digitalocean" {
+  token = "TU_API_TOKEN_DE_DIGITALOCEAN"
+}
+
+resource "digitalocean_droplet" "os3vm" {
+  image  = "ubuntu-22-04-x64"
+  name   = "OS3vm"
+  region = "nyc1"
+  size   = "s-1vcpu-1gb"
+
+--------------------------------------------------------
+
+DEBAJO DE SIZE ESCRIBIR: 
+
+terraform {
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = ">= 1.0.0"
+    }
+  }
+}
+
+provider "digitalocean" {
+  token = "TU_API_TOKEN_DE_DIGITALOCEAN"
+}
+
+resource "digitalocean_droplet" "os3vm" {
+  image  = "ubuntu-22-04-x64"
+  name   = "OS3vm"
+  region = "nyc1"
+  size   = "s-1vcpu-1gb"
+ssh_keys = ["b8:91:f5:14:47:cb:6e:26:8f:50:4e:8d:3f:55:53:9d"]
+}
+
+	
+------------------------------------------------------------------------------
+
+VOLVEMOS A DIGITAL OCEAN Y BUSCAMOS DONDE DICE "API" 
+
+1- GENERAR UN NUEVO TOKEN 
+
+2- LE PONES EL NOMBRE Y LE DAS FULL ACCESS 
+
+3- COPIAMOS EL TOKEN QUE TE GENERE, LO COPIAS Y LO LLEVAS A LA MAQUINA VM HASTA DONDE DICE "TU API TOKEN DE DIGITAL OCEAN".
+
+4- CERRAMOS Y GUARDAMOS. 
+
+====================================================================================
+
+5-) INICIAR TERRAFORM: 
+
+1- terraform init 
+
+2- terraform plan 
+
+3- terraform apply 
+
+4- Y PONEMOS QUE YES 
+
+5- Y ESPERAMOS... 
+
+========================================================================================
+
+6-) NOS DIRIGIMOS A DIGITAL OCEAN Y VAMOS A DROPLETS: Y ESTARA CREADA LA MAQUINA VIRTUAL EN DIGITAL OCEAN. 
+
+1- Entrar por SSH desde la Maquina de Centos y luego por el CLI de la pagina web de DIGITAL Ocean 
+
+=======================================================================================================================
+****************** PRACTICA 3: INSTALACION DE ANSIBLE  ********************************************
+
+1-) INSTALAR PAQUETES DEPENDIENTES:
+
+1- sudo dnf update -y 
+
+2- sudo dnf install gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel libffi-devel wget -y
+
+3- curl https://pyenv.run | bash
+
+4- echo -e 'export PATH="$HOME/.pyenv/bin:$PATH"\neval "$(pyenv init -)"\neval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+
+5- source ~/.bashrc
+
+6- pyenv install 3.12.0
+
+7- pyenv global 3.12.0
+
+8- python --version <========== PARA VERIFICAR SI SE INSTALO PYTHON BIEN
+
+9- sudo dnf install git <============ QUE CREO QUE YA VIENE INSTALADO 
+
+10 - dnf install -y epel-release  
+
+11- sudo dnf install -y python3-libselinux 
+
+12- python3.12 -m ensurepip --upgrade
+
+13- python3.12 -m pip install --upgrade pip 
+
+14- python3.12 -m pip install pywinrm requests-ntlm cryptography 
+
+15- git clone https://github.com/kevinburke/sshpass.git
+
+cd sshpass
+./configure
+make && make install
+
+16- sudo pip3 install --upgrade pip
+
+17 - sudo pip3 install ansible
+
+18- clear
+ 
+======================================================================================================
+
+2-) CONFIGURAR EL ARCHIVO DE HOST DE ANSIBLE 
+
+1- ansible --version <================= PARA MOSTRAR QUE NO SE CREARON LOS ARCHIVOS DE CONFIGURACION
+
+2- mkdir -p /etc/ansible
+
+3- sudo nano /etc/ansible/ansible.cfg
+
+#PATICO <============= PARA ESCRIBIR ALGO COMENTADO
+
+4- sudo nano /etc/ansible/hosts <============= VAMOS A CREAR UNA CONFIGURACION BASICA, PARA VER SI LA RUTA ESTA FUNCIONANDO  
+
+[local]
+localhost ansible_connection=local 
+
+5- ansible --version <=========================== AHORA SI DEBERIAN DE APARECER LOS ARCHIVOS.
+
+6- ansible all -m ping <====== PARA PROBAR EL PING Y EL PONG
+
+=================================================================================================================
+
+ 3-) ABRIR TU MAQUINA DE WINDOWS, TU CLI DE LA MAQUINA DE UBUNTU DE DIGITAL OCEAN Y LA DE CENTOS. ## ESTO ES PARA TENERLA AHI, NO PARA NADA MAS ##
+
+1- sudo nano /etc/ansible/hosts <======== EN LA MAQUINA DE CENTOS 
+
+[win]
+192.168.100.134 <============ IP DE LA MAQUINA DE WINDOWS 
+
+[win:vars]
+ansible_user=ansible
+ansible_password=ansible
+ansible_port=5985
+ansible_connection=winrm
+ansible_winrm_transport=basic
+ansible_winrm_secure_cert_validation=ignore
+ansible_shell_type=powershell
+
+[linux]
+ansible1 ansible_host=198.211.98.178 ansible_user=ansible <=========== IP DE TU MAQUINA DE UBUNTU DE DIGITAL OCEAN 
+
+======================================================================================================================
+
+4-) CREAR UN USUARIO DE ANSIBLE EN EL CLIENTE DE DIGITAL OCEAN
+
+1- useradd -m ansible
+
+2- echo "ansible ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/ansible <========== ESTE COMANDO LOS QUE NOS INDICARA, ES QUE EL ANSIBLE PUEDA PONER COMANDOS PRIVILEGIADOS, SIN NECESIDAD DE UNA CONTRASEÑA.
+
+==========================================================================================================================================================================================================================
+
+5-) CONFIGURAR EL ARCHIVOS DE SSH PARA ANSIBLE
+
+1- mkdir -p /home/ansible/.ssh 
+
+2- chmod 700 /home/ansible/.ssh 
+
+3- chown ansible:ansible /home/ansible/.ssh
+
+4- nano /home/ansible/.ssh/authorized_keys 
+
+---------------------------------------------------------------------------------------------------
+
+TE VAS PARA LA MAQUINA DE CENTOS:
+
+1- ssh-keygen  
+
+2- enter, enter (ya tu sabe)
+
+3- cat /root/.ssh/id_rsa.pub
+
+4- La copias y la pegas a la maquina de Digital Ocean. 
+
+-----------------------------------------------------------------------------------------------
+
+VOLVEMOS A LA MAQUINA DE DIGITAL OCEAN:
+
+Luego de que hayamos puesto la llave, le asignamos permiso a la carpeta 
+
+1- chmod 600 /home/ansible/.ssh/authorized_keys
+
+2- chown ansible:ansible /home/ansible/.ssh/authorized_keys
+
+===========================================================================================================
+
+6-) AHORA NOS VAMOS A LA MAQUINA DE WINDOWS Y VAMOS A CONFIGURAR TODO: 
+
+1- Desactivamos el Firewall: 
+
+Buscamos firewall > Activar y desactivar firewall de Windows Defender > Y lo desactivamos en configuracion de red publica y red privada. 
+
+2- Vamos al icono de Wifi, y el estado de la red la ponemos en privada: Propiedades > Y ahi te aparece. <===== CREO QUE YA VIENE EN PRIVADA.
+
+3- Abrimos una pestaña de Powershell COMO ADMINISTRADOR Y PONEMOS LOS SIGUIENTES COMANDOS:
+
+ 
+
+
+Set-ExecutionPolicy RemoteSigned -Force
+Enable-PSRemoting -Force
+Set-Item WSMan:/localhost/Service/Auth/Basic -Value $true
+Set-Item WSMan:/localhost/Service/AllowUnencrypted -Value $true
+Restart-Service WinRM
+Install-Module -Name PSWindowsUpdate -Force
+New-NetFirewallRule -Name "WinRM HTTP" -Protocol TCP -LocalPort 5985 -Action Allow <== TE PEDIRA UN NOMBRE Y PONDRAS: WinRM-HTTPS
+New-LocalUser -Name "ansible" -Password (ConvertTo-SecureString "ansible" -AsPlainText -Force) -FullName "Ansible User" -Description "Usuario Ansible" 
+Add-LocalGroupMember -Group "Administradores" -Member "ansible" <-- SI TE DA ERRORES CAMBIA ADMINISTRADORES POR "ADMINISTRATOR" si lo tienes en ingles.
+winrm create winrm/config/Listener?Address=*+Transport=HTTP
+winrm enumerate winrm/config/listener 
+
+
+
+
+---------------------------------------------------------------------------------------------------
+
+7-) PRUEBA DE CONEXION UTILIZANDO EL MODULO PING:
+
+1- sudo pip3 install pywinrm <====== PARA INSTALAR winrm
+
+2- ansible -i /etc/ansible/hosts win -m win_ping 
+
+3- ansible -i /etc/ansible/hosts linux -m ping <========== PERO CON LA MAQUINA DE LINUX
+
+=================================================================================================================================================
+****************** PRACTICA 4: COMANDOS AD-HOC  ********************************************
+
+1-) VAMOS A LA PC DE WINDOWS: 
+
+1- Archivos > Esta PC > Local Disk > Users > ansible > Desktop > Y UNA VEZ AHI, CREAR UN ARCHIVO DE TXT 
+
+
+============================================================================================================
+
+2-) VAMOS A LA PC DE CENTOS: ESTE COMANDO ES PARA COPIAR DE UNA UBICACION A OTRA (Win_copy)
+
+1- ansible win -i /etc/ansible/hosts -m win_copy -a "src=C:/Users/ansible/Desktop/Adrian.txt dest=C:/Users/ansible/Documents/ remote_src=yes"
+
+===================================================================================
+
+3-) EL OTRO COMANDO (reboot) es para reiniciar la maquina: 
+
+1- ansible ansible1 -i /etc/ansible/hosts -m reboot --become 
+
+==========================================================================
+
+****************** PRACTICA 5: Playbooks   ********************************************
+
+1-) CREAR EL ARCHIVO: Vamos a crear el playbook para instalar Notepad++ y le vamos a escribir las tareas que debe realizar:
+
+1- nano notepad.yml 
+
+- name: Descargar e instalar Notepad++ en Windows 10
+  hosts: win
+  tasks:
+    - name: Descargando instalador de Notepad++
+      win_get_url:
+        url: https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.5.3/npp.8.5.3.Installer.exe
+        dest: C:\Users\ansible\Downloads\npp_installer.exe
+
+    - name: Ejecutando el instalador de Notepad++
+      win_package:
+        path: C:\Users\ansible\Downloads\npp_installer.exe
+        arguments: /S
+        state: present
+
+==================================================================================================================
+
+2-) PARA EJECUTARLO:
+
+1- ansible-playbook notepad.yml
+
+
+==========================================================================================================================
+
+3-) CREAR EL ARCHIVO: Actualizar los repositorios del sistema
+
+1- nano reboot.yml 
+
+
+- name: Actualizar los repositorios del sistema
+  hosts: ansible1
+  become: yes
+  tasks:
+    - name: Actualizar la lista de paquetes
+      apt:
+        update_cache: yes
+
+==================================================================================================================
+
+4-) PARA EJECUTARLO: 
+
+ansible-playbook reboot.yml
