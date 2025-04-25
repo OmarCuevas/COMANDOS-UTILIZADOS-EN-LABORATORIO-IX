@@ -160,6 +160,13 @@ VOLVEMOS A DIGITAL OCEAN Y BUSCAMOS DONDE DICE "API"
 
 5- Y ESPERAMOS... 
 
+------------------------------------------------
+
+sudo ufw deny ___ <=== EL NUMERO DEL PUERTO A BLOQUEAR
+
+sudo ufw deny 20 <=== POR EJEMPLO
+
+sudo ufw deny 80 <===== Por ejemplo
 ========================================================================================
 
 6-) NOS DIRIGIMOS A DIGITAL OCEAN Y VAMOS A DROPLETS: Y ESTARA CREADA LA MAQUINA VIRTUAL EN DIGITAL OCEAN. 
