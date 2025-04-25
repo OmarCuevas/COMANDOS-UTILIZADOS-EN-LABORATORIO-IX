@@ -167,6 +167,14 @@ sudo ufw deny ___ <=== EL NUMERO DEL PUERTO A BLOQUEAR
 sudo ufw deny 20 <=== POR EJEMPLO
 
 sudo ufw deny 80 <===== Por ejemplo
+
+------------------------------------------------
+
+sudo ufw allow 22 <=== PARA HABILITARLO
+
+sudo ufw enable 
+
+
 ========================================================================================
 
 6-) NOS DIRIGIMOS A DIGITAL OCEAN Y VAMOS A DROPLETS: Y ESTARA CREADA LA MAQUINA VIRTUAL EN DIGITAL OCEAN. 
