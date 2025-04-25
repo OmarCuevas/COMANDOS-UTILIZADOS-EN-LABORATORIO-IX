@@ -419,3 +419,72 @@ winrm enumerate winrm/config/listener
 4-) PARA EJECUTARLO: 
 
 ansible-playbook reboot.yml
+
+====================================================================================================================
+
+
+terraform {
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = ">= 1.0.0"
+    }
+  }
+}
+
+provider "digitalocean" {
+  token = "TU_API_TOKEN_DE_DIGITALOCEAN"
+}
+
+resource "digitalocean_droplet" "os3vm" {
+  image  = "ubuntu-22-04-x64"
+  name   = "OS3vm"
+  region = "nyc1"
+  size   = "s-1vcpu-1gb"
+  tags   = ["os3tag"]
+}
+
+resource "digitalocean_firewall" "firewall_os3vm" {
+  name = "firewall-os3vm"
+
+  droplet_ids = [digitalocean_droplet.os3vm.id]
+
+  # INBOUND - Permitir solo los puertos requeridos
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "443"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "445"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  # OUTBOUND - Permitir todo
+  outbound_rule {
+    protocol             = "tcp"
+    port_range           = "all"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol             = "udp"
+    port_range           = "all"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+}
+
